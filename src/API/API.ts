@@ -3,7 +3,7 @@ import { decryptJson, encryptJson } from "@app/encryption";
 import { type EncryptedData } from "@app/encryption";
 import { route } from "preact-router";
 
-const API_BASE_URL = "http://192.168.237.137";
+const API_BASE_URL = window.location.origin;
 
 interface sensorData {
   temperature: number;

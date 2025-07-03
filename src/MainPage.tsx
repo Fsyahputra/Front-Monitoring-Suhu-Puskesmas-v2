@@ -117,10 +117,10 @@ const MainPage = ({}: MainPageProps) => {
 
     const interval = setInterval(() => {
       checkInter();
-    }, 1000);
+    }, 5000);
     const measurementInterval = setInterval(() => {
       getMeasurementData();
-    }, 5000);
+    }, 2000);
     wifiData();
     userData();
 
