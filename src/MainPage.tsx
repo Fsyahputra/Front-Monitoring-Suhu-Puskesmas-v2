@@ -3,12 +3,11 @@ import Header from "./Header";
 import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
 import { SunIcon } from "@heroicons/react/24/solid";
 import ParamCard from "./ParamCard";
-import MeasurementCard from "./MeasurementCard";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/20/solid";
 import { route } from "preact-router";
 import { userLogout, getUser, getWifi, checkInternet, getSensorData, changeUserInfo, changeWifiInfo } from "@app/API/API";
 import { useEffect, useState } from "preact/hooks";
-import { YAxis, XAxis, CartesianGrid, Line, LineChart, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
+import { YAxis, XAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 
 const DropletIcon = ({ className }: { className?: string }) => {
   return (

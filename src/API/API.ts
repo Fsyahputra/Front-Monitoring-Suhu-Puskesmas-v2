@@ -1,9 +1,10 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
-import { decryptJson, encryptJson } from "@app/encryption";
+import { decryptJson, encrypt, encryptJson, generateRandomIv, toBase64 } from "@app/encryption";
 import { type EncryptedData } from "@app/encryption";
 import { route } from "preact-router";
 
 const API_BASE_URL = window.location.origin;
+const PRIMARY_KEY = new Uint8Array([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]);
 
 interface sensorData {
   temperature: number;
@@ -92,9 +93,15 @@ export async function checkInternet(): Promise<boolean> {
 export async function userLogin(username: string, password: string): Promise<boolean> {
   try {
     console.log("Attempting to log in with username:", username);
+    const plainTextPassword = password;
+    const iv = generateRandomIv();
+    const primaryKey = PRIMARY_KEY;
+    const base64iv = toBase64(iv);
+    const encryptedBase64Password = encrypt(plainTextPassword, toBase64(primaryKey), base64iv);
     const data = new URLSearchParams();
     data.append("username", username);
-    data.append("password", password);
+    data.append("password", encryptedBase64Password);
+    data.append("iv", base64iv);
     const response = await commRequest.post("/", data);
     if (response.status !== 200) {
       return false;
