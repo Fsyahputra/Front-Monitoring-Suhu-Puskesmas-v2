@@ -3,7 +3,8 @@ import { decryptJson, encryptJson } from "@app/encryption";
 import { type EncryptedData } from "@app/encryption";
 import { route } from "preact-router";
 
-const API_BASE_URL = "http://192.168.237.137";
+const API_BASE_URL = window.location.origin;
+const FIREBASE_API_URL = "https://monitoring-puskesmas-default-rtdb.asia-southeast1.firebasedatabase.app/sensor.json";
 
 interface sensorData {
   temperature: number;
@@ -11,6 +12,31 @@ interface sensorData {
   timestamp: string;
   unixtimestamp: number;
 }
+
+export const getFirebaseData = async (num: number): Promise<sensorData[] | null> => {
+  try {
+    const response = await axios.get(`${FIREBASE_API_URL}?orderBy="$key"&limitToLast=${num}`);
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch data from Firebase");
+    }
+    const data: Record<string, sensorData> = response.data;
+    if (!data) {
+      throw new Error("No data found in Firebase");
+    }
+    console.log("Fetched data from Firebase:", data);
+    const sensorDataArray: sensorData[] = Object.values(data).map((item) => ({
+      temperature: item.temperature,
+      humidity: item.humidity,
+      timestamp: item.timestamp,
+      unixtimestamp: item.unixtimestamp,
+    }));
+    console.log("Processed sensor data:", sensorDataArray);
+    return sensorDataArray;
+  } catch (error) {
+    console.error("Error fetching data from Firebase:", error);
+    return null;
+  }
+};
 
 const getToken = (): string => {
   const token = localStorage.getItem("token");
@@ -295,5 +321,25 @@ export async function changeWifiInfo(ssid: string, password: string): Promise<[s
       decryptedData = decryptResponse((error as any).response);
     }
     return [decryptedData.error || "An error occurred while changing WiFi information", false];
+  }
+}
+
+export async function downloadSensorData(): Promise<Blob | null> {
+  try {
+    const response = await axios.get(`${FIREBASE_API_URL}`);
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch sensor data from Firebase");
+    }
+    const data: Record<string, sensorData> = response.data;
+    if (!data) {
+      throw new Error("No data found in Firebase");
+    }
+
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    return blob;
+  } catch (error) {
+    console.error("Error fetching sensor data from Firebase:", error);
+    return null;
   }
 }

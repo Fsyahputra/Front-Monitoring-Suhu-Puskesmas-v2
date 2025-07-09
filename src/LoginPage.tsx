@@ -23,7 +23,10 @@ const LoginPage = ({}: LoginPageProps) => {
         console.error("Error checking internet connection:", error);
       }
     };
-    checkConnection();
+    setInterval(() => {
+      checkConnection();
+    }, 5000); // Check connection every 5 seconds
+    checkConnection(); // Initial check
   }, []);
 
   const handlerLogin = async (e: Event) => {
